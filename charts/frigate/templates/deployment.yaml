@@ -143,12 +143,18 @@ spec:
               subPath: config.yml
               name: configmap
             {{- end }}
+            {{- if .Values.persistence.config.enabled }}
             - mountPath: /config
               name: config
+            {{- end }}
+            {{- if .Values.persistence.data.enabled }}
             - mountPath: /data
               name: data
+            {{- end }}
+            {{- if .Values.persistence.media.enabled }}
             - mountPath: /media
               name: media
+            {{- end }}
             - name: dshm
               mountPath: /dev/shm
             {{- if .Values.tmpfs.enabled }}
@@ -167,26 +173,20 @@ spec:
           hostPath:
             path: {{ .Values.coral.hostPath }}
         {{- end }}
-        - name: config
         {{- if .Values.persistence.config.enabled }}
+        - name: config
           persistentVolumeClaim:
             claimName: {{ if .Values.persistence.config.existingClaim }}{{ .Values.persistence.config.existingClaim }}{{- else }}{{ template "frigate.fullname" . }}-config{{- end }}
-        {{- else }}
-          emptyDir: {}
         {{- end }}
-        - name: data
         {{- if .Values.persistence.data.enabled }}
+        - name: data
           persistentVolumeClaim:
             claimName: {{ if .Values.persistence.data.existingClaim }}{{ .Values.persistence.data.existingClaim }}{{- else }}{{ template "frigate.fullname" . }}-data{{- end }}
-        {{- else }}
-          emptyDir: {}
         {{- end }}
-        - name: media
         {{- if .Values.persistence.media.enabled }}
+        - name: media
           persistentVolumeClaim:
             claimName: {{ if .Values.persistence.media.existingClaim }}{{ .Values.persistence.media.existingClaim }}{{- else }}{{ template "frigate.fullname" . }}-media{{- end }}
-        {{- else }}
-          emptyDir: {}
         {{- end }}
         - name: dshm
           emptyDir:
